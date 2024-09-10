@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#Script to create a dataset of GprMax simulations
+# Script to create a dataset of GprMax simulations
+# i.e. this package below to be installed
+# https://docs.gprmax.com/en/latest/include_readme.html
+
+
 from scipy.constants import c
 import subprocess
 import h5py
@@ -16,8 +20,11 @@ from utils.delay_propagation import delai_propag_ttw
 
 os.environ["PATH"] = os.environ["PATH"]+":/usr/local/cuda/bin/"
 
-folder= "generic3"
-directory = f'/home/xxx/gprMax/ttw_dataset/{folder}/'
+#To adapt to your setup
+repo_name ='lcrpca_github'
+folder= 'gprmax'
+directory = f'./{folder}/'
+
 location_in = directory + 'dataset_creation.in'
 location_sh = directory + 'dataset_creation.sh'
       
@@ -108,7 +115,7 @@ nb_noise = 10
 d = float(wall[5]) - float(wall[2])
 eps = float(material[1])
 zoff = float(wall[2]) - 0.1
-ricker = np.load('/home/xxx/gprMax/ttw_dataset/ricker.npy')
+ricker = np.load(directory+ 'ricker.npy')
 
 #Save ttw returns grid
 try:
@@ -206,9 +213,9 @@ for sim_nb,sim_done in enumerate(tracking):
         #Edit sh file
         for k,line in enumerate(shlines):
             if "gpu" in line:
-                shlines[k] = f'python -m gprMax ttw_dataset/{folder}/scene_{sim_nb}.in -n {npos} -gpu \n'
+                shlines[k] = f'python -m gprMax home/xxx/Documents/{repo_name}/{directory}/scene_{sim_nb}.in -n {npos} -gpu \n'
             if "outputfiles_merge" in line:
-                shlines[k] = f'python -m tools.outputfiles_merge ttw_dataset/{folder}/scene_{sim_nb} --remove-files \n'
+                shlines[k] = f'python -m tools.outputfiles_merge home/xxx/Documents/{repo_name}/{directory}/scene_{sim_nb} --remove-files \n'
 
         file = open(directory + f'scene_{sim_nb}.sh',"w")
         file.writelines(shlines)
@@ -263,7 +270,7 @@ for sim_nb,sim_done in enumerate(tracking):
             Bscan_n = Bscan + cgn @ np.diag(np.sqrt(text))
 
             bp_img = back_projection(Bscan_n, dt, dim_scene, dx_bp, dz_bp, radar_step,
-                                     xn,d,eps,zoff,rets, pulse=ricker,freespace=False)
+                                     xn,d,eps,zoff,rets, pulse=ricker,freespace=False,posinitx=radar_pos_init)
             plot_bp(np.abs(bp_img), dim_scene, dim_img,crossr_targs[:,sim_nb],
                     downr_targs[:,sim_nb],radius_targs[:,sim_nb])
 
@@ -299,14 +306,14 @@ from utils.backprojection import back_projection,plot_bp
 ind = 5
 Bscan_n = np.load(directory + f'scene_{ind}_noise_{5}_Ybp.npy')
 
-ricker = np.load('/home/xxx/gprMax/ttw_dataset/ricker.npy')
+ricker = np.load(directory+'ricker.npy')
 
 d = float(wall[5]) - float(wall[2])
 eps = float(material[1])
 zoff = float(wall[2]) - 0.1
 
 bp_img = back_projection(Bscan_n, dt, dim_scene, dx_bp, dz_bp, radar_step, xn,d,eps,zoff,
-                         rets=rets,pulse=ricker)
+                         rets=rets,pulse=ricker,posinitx=radar_pos_init)
 plot_bp(bp_img, dim_scene, dim_img,crossr_targs[:,ind],downr_targs[:,ind],radius_targs[:,ind])
 
 L,S = R_pca(bp_img).fit()
@@ -368,7 +375,7 @@ d = float(wall[5]) - float(wall[2])
 eps = float(material[1])
 zoff = float(wall[2]) - 0.1
 
-ricker = np.load('/home/xxx/gprMax/ttw_dataset/ricker.npy')
+ricker = np.load(directory+'/ricker.npy')
 rets = np.load(directory + 'rets.npy')
 dim_scene = np.load(directory + 'dim_scene.npy')
 dim_img = np.load(directory + 'dim_img.npy')

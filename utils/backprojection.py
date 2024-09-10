@@ -15,18 +15,18 @@ from utils.delay_propagation import delai_propag_ttw
 
 #Backprojection algorithm
 
-def back_projection(y,dt,dim_scene,dx,dz,dn,xn, d, eps, zoff,posinitx=0,rets=None,pulse=None,theta = np.pi,freespace=False):
+def back_projection(y,dt,dim_scene,dx,dz,dn,xn, d, eps, zoff,posinitx=0.,rets=None,pulse=None,theta = np.pi,freespace=False):
     
     N = y.shape[1]
     
     if pulse is None:
-        sigrec_fa = y
+        y_mf = y
     else:
-        sigrec_fa=np.zeros(y.shape,dtype=np.complex_)
+        y_mf=np.zeros(y.shape,dtype=np.complex_)
         for n in range(N):
-            sigrec_fa[:,n]=fft.ifft(fft.fft(y[:,n]) * np.conj(fft.fft(pulse)))
+            y_mf[:,n]=fft.ifft(fft.fft(y[:,n]) * np.conj(fft.fft(pulse)))
       
-    # plt.imshow(10*np.log10(np.abs(sigrec_fa)+1e-18),aspect='auto',vmin=-50,origin='lower')
+    # plt.imshow(10*np.log10(np.abs(y_mf)+1e-18),aspect='auto',vmin=-50,origin='lower')
     # plt.colorbar()
     # plt.show()
          
@@ -72,7 +72,7 @@ def back_projection(y,dt,dim_scene,dx,dz,dn,xn, d, eps, zoff,posinitx=0,rets=Non
                 
                 
                 indice=int(round(ret/dt))
-                cimg[zi,xi] += sigrec_fa[indice,n]         
+                cimg[zi,xi] += y_mf[indice,n]         
     return cimg
 
 from matplotlib.patches import Circle

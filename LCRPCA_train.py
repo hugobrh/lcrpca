@@ -44,27 +44,20 @@ minloss = torch.inf
 print('Loading phase...')
 print('----------------')
 
-data_dir = "xxx"
-data_dir2 = "xxx"
+data_dir = "./gprmax/"
 
 shape_dset=(110,100)
 
 #training
 train_dataset=SimuDataset(round(TrainInstances),shape_dset,
                            train=0,data_dir=data_dir)
-train_dataset2=SimuDataset(round(TrainInstances),shape_dset,
-                           train=0,data_dir=data_dir2)
-train_datasets = data.ConcatDataset([train_dataset,train_dataset2])
-train_loader=data.DataLoader(train_datasets,batch_size=BatchSize,shuffle=True)
+train_loader=data.DataLoader(train_dataset,batch_size=BatchSize,shuffle=True)
 
 
 #validation
 val_dataset=SimuDataset(round(ValInstances),shape_dset, 
                          train=1,data_dir=data_dir)
-val_dataset2=SimuDataset(round(ValInstances),shape_dset, 
-                         train=1,data_dir=data_dir2)
-val_datasets = data.ConcatDataset([val_dataset,val_dataset2])
-val_loader=data.DataLoader(val_datasets,batch_size=ValBatchSize,shuffle=True)
+val_loader=data.DataLoader(val_dataset,batch_size=ValBatchSize,shuffle=True)
 
 print('Finished loading.\n')
 
